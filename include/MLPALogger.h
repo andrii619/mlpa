@@ -283,92 +283,92 @@ static void print(std::ostream& os, const std::unordered_set<T,V> &s) {
 
 
 
-template <typename T>
-struct LoggerFormatter<BinaryTreeNode<T> *> {
+// template <typename T>
+// struct LoggerFormatter<BinaryTreeNode<T> *> {
     
-    static void print(std::ostream &os, BinaryTreeNode<T> * root) {
-        printTree(os, root, "", true);
-    }
+//     static void print(std::ostream &os, BinaryTreeNode<T> * root) {
+//         printTree(os, root, "", true);
+//     }
     
-    private:
-    static void printTree(std::ostream &os, BinaryTreeNode<T>* root,const std::string &indent, bool isRight) {
-    if (!root) return;
+//     private:
+//     static void printTree(std::ostream &os, BinaryTreeNode<T>* root,const std::string &indent, bool isRight) {
+//     if (!root) return;
 
-    if (root->right) {
-        printTree(os, root->right, indent + (isRight ? "        " : " |      "), true);
-    }
+//     if (root->right) {
+//         printTree(os, root->right, indent + (isRight ? "        " : " |      "), true);
+//     }
 
-    os << indent;
-    if (isRight) {
-        os << " /----- ";
-    } else {
-        os << " \\----- ";
-    }
-    // std::cout << root->val << std::endl;
-    printElement(os, root->val);
-    os << "\n";
+//     os << indent;
+//     if (isRight) {
+//         os << " /----- ";
+//     } else {
+//         os << " \\----- ";
+//     }
+//     // std::cout << root->val << std::endl;
+//     printElement(os, root->val);
+//     os << "\n";
 
-    if (root->left) {
-        printTree(os, root->left, indent + (isRight ? " |      " : "        "), false);
-    }
-}
+//     if (root->left) {
+//         printTree(os, root->left, indent + (isRight ? " |      " : "        "), false);
+//     }
+// }
     
-};
+// };
 
 
 
 
-template <typename T>
-struct LoggerFormatter<BinaryTreeNode<T>> {
+// template <typename T>
+// struct LoggerFormatter<BinaryTreeNode<T>> {
     
-    static void print(std::ostream &os, BinaryTreeNode<T> root) {
-        printTree(os, root, "", true);
-    }
+//     static void print(std::ostream &os, BinaryTreeNode<T> root) {
+//         printTree(os, root, "", true);
+//     }
     
-    private:
-    static void printTree(std::ostream &os, BinaryTreeNode<T> root,const std::string &indent, bool isRight) {
-    // if (!root) return;
+//     private:
+//     static void printTree(std::ostream &os, BinaryTreeNode<T> root,const std::string &indent, bool isRight) {
+//     // if (!root) return;
 
-    if (root.right) {
-        printTree(os, *(root.right), indent + (isRight ? "        " : " |      "), true);
-    }
+//     if (root.right) {
+//         printTree(os, *(root.right), indent + (isRight ? "        " : " |      "), true);
+//     }
 
-    os << indent;
-    if (isRight) {
-        os << " /----- ";
-    } else {
-        os << " \\----- ";
-    }
-    // std::cout << root->val << std::endl;
-    printElement(os, root.val);
-    os << "\n";
+//     os << indent;
+//     if (isRight) {
+//         os << " /----- ";
+//     } else {
+//         os << " \\----- ";
+//     }
+//     // std::cout << root->val << std::endl;
+//     printElement(os, root.val);
+//     os << "\n";
 
-    if (root.left) {
-        printTree(os, *(root.left), indent + (isRight ? " |      " : "        "), false);
-    }
-}
+//     if (root.left) {
+//         printTree(os, *(root.left), indent + (isRight ? " |      " : "        "), false);
+//     }
+// }
     
-};
+// };
 
 
 
-template <typename T>
-struct LoggerFormatter<LinkedListNode<T>> {
+// template <typename T>
+// struct LoggerFormatter<LinkedListNode<T>> {
     
-void print(std::ostream &os,LinkedListNode<T> *head){
+// void print(std::ostream &os,LinkedListNode<T> *head){
     
-    os << "List:[";
+//     os << "List:[";
     
-    while(head!=nullptr){
-        os << head->val << "  -->  ";
-        head = head->next;
-    }
-    os << "]"<< std::endl;
+//     while(head!=nullptr){
+//         os << head->val << "  -->  ";
+//         head = head->next;
+//     }
+//     os << "]"<< std::endl;
     
     
-}
+// }
     
-};
+// };
 
 
 
@@ -440,9 +440,13 @@ class LoggerStream {
     
     public:
     
-    LoggerStream(LogLevel level, std::ostream &out = std::cout);
+    LoggerStream(LogLevel level, std::ostream &out = std::cout): log_level_(level), out_stream_(out) {
+        
+    }
     
-    ~LoggerStream();
+    ~LoggerStream() {
+        flushToStream();
+}
     
     
     private:
@@ -513,9 +517,116 @@ class LoggerStream {
     
     private:
     
-    static std::string BuildAnsiStyle(LogLevel level, const Style &style);
+    static std::string BuildAnsiStyle(LogLevel level, const Style &style) {
+  std::string code = "\033[";
+  bool has_any = false;
+
+  if (style.bold) {
+    code += "1;";
+    has_any = true;
+  }
+
+  if (style.underline) {
+    code += "4;";
+    has_any = true;
+  }
+  
+  
+  if (style.italic) {
+    code += "3;";
+    has_any = true;
+  }
+  
+
+  int color_code = -1;
+  switch (style.text_color) {
+    case LogColor::Black:
+      color_code = 30;
+      break;
+    case LogColor::Red:
+      color_code = 31;
+      break;
+    case LogColor::Green:
+      color_code = 32;
+      break;
+    case LogColor::Yellow:
+      color_code = 33;
+      break;
+    case LogColor::Blue:
+      color_code = 34;
+      break;
+    case LogColor::Magenta:
+      color_code = 35;
+      break;
+    case LogColor::Cyan:
+      color_code = 36;
+      break;
+    case LogColor::White:
+      color_code = 37;
+      break;
+    case LogColor::BrightBlack:
+      color_code = 90;
+      break;
+    case LogColor::BrightRed:
+      color_code = 91;
+      break;
+    case LogColor::BrightGreen:
+      color_code = 92;
+      break;
+    case LogColor::BrightYellow:
+      color_code = 93;
+      break;
+    case LogColor::BrightBlue:
+      color_code = 94;
+      break;
+    case LogColor::BrightMagenta:
+      color_code = 95;
+      break;
+    case LogColor::BrightCyan:
+      color_code = 96;
+      break;
+    case LogColor::BrightWhite:
+      color_code = 97;
+      break;
+    default:
+      break;
+  }
+
+  if (color_code == -1) {
+    switch (level) {
+      case LogLevel::kLogDebug: {
+        color_code = 36;
+      }; break;
+      case LogLevel::kLogError: {
+        color_code = 31;
+      }; break;
+      case LogLevel::kLogInfo: {
+        color_code = 32;
+      }; break;
+      case LogLevel::kLogWarn: {
+        color_code = 33;
+      }; break;
+    };
+    has_any = true;
+  }
+  if (color_code != -1) {
+    code += std::to_string(color_code) + ";";
+    has_any = true;
+  }
+
+  if (!has_any) return "\033[0m";
+
+  if (code.back() == ';') code.pop_back();
+  code += "m";
+  return code;
+}
     
-    void flushToStream();
+    void flushToStream() {
+        std::string ansi_prefix = BuildAnsiStyle(log_level_, style_);
+        out_stream_ << ansi_prefix << buffer_.str() << "\033[0m" << std::endl;
+        buffer_.str("");
+        buffer_.clear();
+}
     
     LogLevel log_level_{LogLevel::kLogInfo};
     std::ostream& out_stream_;
